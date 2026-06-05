@@ -2,10 +2,10 @@ import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { formatCurrency } from "@/lib/utils";
-import type { OutfitPlan } from "@/types/plan";
+import type { Outfit } from "@/types/plan";
 
 interface OutfitPlanCardProps {
-  outfit: OutfitPlan;
+  outfit: Outfit;
 }
 
 export function OutfitPlanCard({ outfit }: OutfitPlanCardProps) {

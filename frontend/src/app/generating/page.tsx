@@ -5,7 +5,9 @@ import { useRouter } from "next/navigation";
 import { AppShell } from "@/components/layout/app-shell";
 import { LinkButton } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { generatePlan } from "@/lib/api";
 import { clamp } from "@/lib/utils";
+import type { CaseId, PlanRequest, UserProfile } from "@/types/plan";
 
 const generationSteps = [
   "正在理解视频场景",
@@ -17,22 +19,51 @@ const generationSteps = [
 export default function GeneratingPage() {
   const router = useRouter();
   const [progress, setProgress] = useState(8);
+  const [error, setError] = useState("");
   const activeIndex = useMemo(
     () => clamp(Math.floor(progress / 25), 0, generationSteps.length - 1),
     [progress]
   );
 
   useEffect(() => {
+    let active = true;
     const interval = window.setInterval(() => {
       setProgress((current) => clamp(current + 13, 8, 100));
     }, 320);
-    const timer = window.setTimeout(() => {
-      router.push("/result/demo");
-    }, 3200);
+
+    async function runGeneration() {
+      try {
+        const inspiration = readStorage<{ caseId?: CaseId; douyinUrl?: string }>(
+          "douyin-travel-inspiration"
+        );
+        const profile = readStorage<UserProfile>("douyin-travel-profile");
+        const request: PlanRequest | undefined = profile
+          ? {
+              caseId: inspiration?.caseId,
+              douyinUrl: inspiration?.douyinUrl,
+              profile
+            }
+          : undefined;
+        const response = await generatePlan(request);
+
+        if (!active) {
+          return;
+        }
+
+        setProgress(100);
+        router.push(`/result/${response.plan.id}`);
+      } catch {
+        if (active) {
+          setError("生成失败，请返回后重新尝试。");
+        }
+      }
+    }
+
+    void runGeneration();
 
     return () => {
+      active = false;
       window.clearInterval(interval);
-      window.clearTimeout(timer);
     };
   }, [router]);
 
@@ -42,7 +73,7 @@ export default function GeneratingPage() {
         <div>
           <p className="text-sm font-semibold text-[#bf5f47]">第 3 步</p>
           <h1 className="mt-1 text-3xl font-bold text-[#24211d]">正在生成你的出游行动方案</h1>
-          <p className="mt-2 text-sm leading-6 text-[#756f68]">MVP 使用模拟进度，稍后自动进入结果页。</p>
+          <p className="mt-2 text-sm leading-6 text-[#756f68]">AI正在分析旅游场景...</p>
         </div>
         <Card>
           <div className="h-3 overflow-hidden rounded-full bg-[#f1e6da]">
@@ -71,6 +102,7 @@ export default function GeneratingPage() {
               </div>
             ))}
           </div>
+          {error ? <p className="mt-4 text-sm font-semibold text-[#9f422e]">{error}</p> : null}
         </Card>
         <div className="flex flex-col gap-3 sm:flex-row">
           <LinkButton href="/profile" variant="secondary" className="w-full sm:w-auto">
@@ -83,4 +115,13 @@ export default function GeneratingPage() {
       </div>
     </AppShell>
   );
+}
+
+function readStorage<T>(key: string): T | null {
+  try {
+    const value = window.localStorage.getItem(key);
+    return value ? (JSON.parse(value) as T) : null;
+  } catch {
+    return null;
+  }
 }

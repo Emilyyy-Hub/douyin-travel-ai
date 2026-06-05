@@ -2,7 +2,7 @@ import Image from "next/image";
 import { AppShell } from "@/components/layout/app-shell";
 import { LinkButton } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { travelCases } from "@/data/mock-plan";
+import { fetchTravelCases } from "@/lib/api";
 
 const steps = [
   {
@@ -19,7 +19,9 @@ const steps = [
   }
 ];
 
-export default function HomePage() {
+export default async function HomePage() {
+  const travelCases = await fetchTravelCases();
+
   return (
     <AppShell eyebrow="MVP Demo">
       <section className="grid gap-8 lg:grid-cols-[1.05fr_0.95fr] lg:items-center">

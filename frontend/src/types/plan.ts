@@ -29,35 +29,14 @@ export interface PlanRequest {
   profile: UserProfile;
 }
 
-export interface SceneAnalysis {
-  name: string;
-  image: string;
-  imageAlt: string;
-  moodKeywords: string[];
-  palette: string[];
-  bestTime: string;
-  cameraSpots: string[];
-  compositionTips: string[];
-}
-
-export type ProductCategory =
-  | "头饰"
-  | "耳饰"
-  | "上衣"
-  | "下装"
-  | "连衣裙"
-  | "袜子"
-  | "鞋子"
-  | "包";
-
 export interface OutfitItem {
-  category: ProductCategory;
+  category: string;
   name: string;
   owned: boolean;
   price: number;
 }
 
-export interface OutfitPlan {
+export interface Outfit {
   id: string;
   previewImage: string;
   previewAlt: string;
@@ -72,7 +51,14 @@ export interface OutfitPlan {
   pose: string;
 }
 
-export interface ActionCard {
+export interface PackingItem {
+  id: string;
+  title: string;
+  items: string[];
+  type: "mustBring" | "owned" | "toBuy";
+}
+
+export interface ActionItem {
   id: string;
   scene: string;
   time: string;
@@ -82,12 +68,43 @@ export interface ActionCard {
   notes: string[];
 }
 
+export interface Plan {
+  id: string;
+  destination: string;
+  weather: string;
+  outfits: Outfit[];
+  packingList: PackingItem[];
+  actions: ActionItem[];
+  analysis: string;
+}
+
+export interface GeneratePlanResponse {
+  success: true;
+  plan: Plan;
+}
+
+export interface GetPlanResponse {
+  success: true;
+  plan: Plan;
+}
+
+export interface SceneAnalysis {
+  name: string;
+  image: string;
+  imageAlt: string;
+  moodKeywords: string[];
+  palette: string[];
+  bestTime: string;
+  cameraSpots: string[];
+  compositionTips: string[];
+}
+
 export interface PackingGroup {
   title: string;
   items: string[];
 }
 
-export interface PackingList {
+export interface LegacyPackingList {
   mustBring: PackingGroup[];
   owned: string[];
   toBuy: string[];
@@ -98,7 +115,10 @@ export interface TravelPlan {
   id: string;
   case: TravelCase;
   sceneAnalysis: SceneAnalysis;
-  outfits: OutfitPlan[];
-  actionCards: ActionCard[];
-  packingList: PackingList;
+  outfits: Outfit[];
+  actionCards: ActionItem[];
+  packingList: LegacyPackingList;
 }
+
+export type OutfitPlan = Outfit;
+export type ActionCard = ActionItem;

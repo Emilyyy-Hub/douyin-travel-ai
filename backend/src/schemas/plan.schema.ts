@@ -8,10 +8,16 @@ export const userProfileSchema = z.object({
   photoGoal: z.string().min(1).max(120),
   shoePreference: z.string().min(1).max(60),
   coveragePreference: z.string().min(1).max(60),
-  skinTone: z.string().min(1).max(60).optional()
+  skinTone: z.string().min(1).max(60).optional(),
+  tripDays: z.number().int().min(1).max(30).optional().default(3),
+  gender: z.string().min(1).max(10).optional().default("女")
 });
 
 export const generatePlanSchema = z.object({
   analysisId: z.string().min(1),
-  userProfile: userProfileSchema
+  userProfile: userProfileSchema,
+  destination: z.string().min(1).max(100).optional(),
+  styleKeywords: z.string().min(1).max(200).optional(),
+  sceneKeywords: z.string().min(1).max(200).optional()
 });
+

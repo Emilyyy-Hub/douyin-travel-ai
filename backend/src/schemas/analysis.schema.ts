@@ -20,5 +20,12 @@ export const analyzeVideoSchema = z.discriminatedUnion("sourceType", [
   z.object({
     sourceType: z.literal("douyin_url"),
     videoUrl: douyinUrlSchema
+  }),
+  z.object({
+    sourceType: z.literal("manual_keywords"),
+    destination: z.string().min(1, "请输入目的地"),
+    styleKeywords: z.string().min(1).max(200).optional(),
+    sceneKeywords: z.string().min(1).max(200).optional()
   })
 ]);
+

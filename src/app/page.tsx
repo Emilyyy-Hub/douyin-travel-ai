@@ -1,4 +1,4 @@
-import Image from "next/image";
+
 import { AppShell } from "@/components/layout/app-shell";
 import { LinkButton } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -41,13 +41,10 @@ export default async function HomePage() {
         </div>
         <Card className="p-3">
           <div className="relative h-72 w-full overflow-hidden rounded-md">
-            <Image
+            <img
               src={travelCases[0].coverImage}
               alt={travelCases[0].coverAlt}
-              fill
-              sizes="(min-width: 1024px) 480px, 100vw"
-              className="object-cover"
-              priority
+              className="absolute inset-0 h-full w-full object-cover"
             />
           </div>
           <div className="p-3">
@@ -85,12 +82,10 @@ export default async function HomePage() {
           {travelCases.map((item) => (
             <Card key={item.id}>
               <div className="relative h-36 w-full overflow-hidden rounded-md">
-                <Image
+                <img
                   src={item.coverImage}
                   alt={item.coverAlt}
-                  fill
-                  sizes="(min-width: 768px) 320px, 100vw"
-                  className="object-cover"
+                  className="absolute inset-0 h-full w-full object-cover"
                 />
               </div>
               <p className="mt-3 text-base font-semibold text-[#24211d]">{item.title}</p>

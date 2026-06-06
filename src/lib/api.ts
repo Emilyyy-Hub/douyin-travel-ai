@@ -1,4 +1,10 @@
-import { demoPlan, travelCases } from "@/data/mock-plan";
+import {
+  demoPlan,
+  travelCases,
+  productCatalog,
+  enhancedPackingList,
+  demoPlanSummary
+} from "@/data/mock-plan";
 import type {
   CaseId,
   GeneratePlanResponse,
@@ -27,7 +33,7 @@ function wait(ms: number): Promise<void> {
 
 function toPackingItems(plan: TravelPlan): PackingItem[] {
   const mustBring = plan.packingList.mustBring.map((group, index) => ({
-    id: `must-bring-${index + 1}`,
+    id: "must-bring-" + (index + 1),
     title: group.title,
     items: group.items,
     type: "mustBring" as const
@@ -50,7 +56,10 @@ function toPackingItems(plan: TravelPlan): PackingItem[] {
   ];
 }
 
-function toPlan(plan: TravelPlan): Plan {
+function toPlan(plan: TravelPlan, userProfile?: PlanRequest["profile"]): Plan {
+  const tripDays = userProfile?.tripDays ? parseInt(userProfile.tripDays, 10) || 3 : 3;
+  const gender = userProfile?.gender || "女";
+
   return {
     id: plan.id,
     destination: plan.case.location,
@@ -58,12 +67,17 @@ function toPlan(plan: TravelPlan): Plan {
     outfits: plan.outfits,
     packingList: toPackingItems(plan),
     actions: plan.actionCards,
+    products: productCatalog,
+    enhancedPacking: enhancedPackingList,
     analysis: [
       plan.sceneAnalysis.name,
       plan.sceneAnalysis.moodKeywords.join(" / "),
       plan.sceneAnalysis.bestTime,
       plan.sceneAnalysis.compositionTips.join("；")
-    ].join("。")
+    ].join("。"),
+    tripDays,
+    gender,
+    summary: { ...demoPlanSummary, tripDays, gender }
   };
 }
 
@@ -71,7 +85,6 @@ function getMockTravelPlan(id: string): TravelPlan | null {
   if (id !== "demo") {
     return null;
   }
-
   return demoPlan;
 }
 
@@ -87,45 +100,28 @@ export async function fetchTravelCase(id: CaseId): Promise<TravelCase | null> {
 
 export async function generatePlan(request?: PlanRequest): Promise<GeneratePlanResponse> {
   await wait(MOCK_NETWORK_DELAY);
-
-  const selectedCase =
-    travelCases.find((item) => item.id === request?.caseId) ?? demoPlan.case;
+  const selectedCase = travelCases.find((item) => item.id === request?.caseId) ?? demoPlan.case;
   const travelPlan: TravelPlan = {
     ...demoPlan,
     id: "demo",
     case: selectedCase
   };
-
-  return {
-    success: true,
-    plan: toPlan(travelPlan)
-  };
+  return { success: true, plan: toPlan(travelPlan, request?.profile) };
 }
 
 export async function getPlanById(id: string): Promise<GetPlanResponse | null> {
   await wait(SHORT_NETWORK_DELAY);
   const plan = getMockTravelPlan(id);
-
   if (!plan) {
     return null;
   }
-
-  return {
-    success: true,
-    plan: toPlan(plan)
-  };
+  return { success: true, plan: toPlan(plan) };
 }
 
 export async function createDemoPlan(request: PlanRequest): Promise<TravelPlan> {
   const response = await generatePlan(request);
-  const selectedCase =
-    travelCases.find((item) => item.id === request.caseId) ?? demoPlan.case;
-
-  return {
-    ...demoPlan,
-    id: response.plan.id,
-    case: selectedCase
-  };
+  const selectedCase = travelCases.find((item) => item.id === request.caseId) ?? demoPlan.case;
+  return { ...demoPlan, id: response.plan.id, case: selectedCase };
 }
 
 export async function fetchPlan(id: string): Promise<Plan | null> {

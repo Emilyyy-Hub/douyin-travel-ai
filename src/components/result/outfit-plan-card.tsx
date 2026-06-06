@@ -1,4 +1,4 @@
-import Image from "next/image";
+
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { formatCurrency } from "@/lib/utils";
@@ -12,15 +12,19 @@ export function OutfitPlanCard({ outfit }: OutfitPlanCardProps) {
   return (
     <Card className="overflow-hidden p-0">
       <div className="relative h-72 w-full overflow-hidden sm:h-80">
-        <Image
+        <img
           src={outfit.previewImage}
           alt={outfit.previewAlt}
-          fill
-          sizes="(min-width: 1024px) 280px, 100vw"
-          className="object-cover"
+          className="absolute inset-0 h-full w-full object-cover"
         />
       </div>
       <div className="space-y-4 p-4">
+        {/* Evaluation badges */}
+        <div className="flex flex-wrap gap-1.5">
+          {outfit.photoScore ? <span className="rounded bg-[#e9f0ec] px-2 py-0.5 text-xs font-semibold text-[#607d6c]">适合拍照</span> : null}
+          {outfit.comfortScore ? <span className="rounded bg-[#e9f0ec] px-2 py-0.5 text-xs font-semibold text-[#607d6c]">舒适好走</span> : null}
+          {outfit.slimScore ? <span className="rounded bg-[#e9f0ec] px-2 py-0.5 text-xs font-semibold text-[#607d6c]">显高显瘦</span> : null}
+        </div>
         <div>
           <p className="text-xs font-semibold text-[#bf5f47]">{outfit.style}</p>
           <h2 className="mt-1 text-xl font-bold text-[#24211d]">{outfit.name}</h2>
@@ -38,7 +42,7 @@ export function OutfitPlanCard({ outfit }: OutfitPlanCardProps) {
             {outfit.items.length > 0 ? (
               outfit.items.map((item) => (
                 <div
-                  key={`${outfit.id}-${item.category}`}
+                  key={outfit.id + "-" + item.category}
                   className="flex items-center justify-between gap-3 rounded-lg bg-[#fbf8f3] px-3 py-2 text-sm"
                 >
                   <span className="text-[#4a433c]">
@@ -56,9 +60,6 @@ export function OutfitPlanCard({ outfit }: OutfitPlanCardProps) {
         </div>
         <div className="flex flex-col gap-3 border-t border-[#e8ded1] pt-4 sm:flex-row sm:items-center sm:justify-between">
           <p className="text-base font-bold text-[#24211d]">总价格 {formatCurrency(outfit.totalPrice)}</p>
-          <Button type="button" variant="secondary">
-            查看商品
-          </Button>
         </div>
       </div>
     </Card>
@@ -73,3 +74,4 @@ function Detail({ label, value }: { label: string; value: string }) {
     </div>
   );
 }
+

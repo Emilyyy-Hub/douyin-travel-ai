@@ -33,7 +33,7 @@ export default function GeneratingPage() {
 
     async function runGeneration() {
       try {
-        const inspiration = readStorage<{ caseId?: CaseId; douyinUrl?: string }>(
+        const inspiration = readStorage<{ caseId?: CaseId; douyinUrl?: string; inputMode?: string; destination?: string; styleKeywords?: string; sceneKeywords?: string }>(
           "douyin-travel-inspiration"
         );
         const profile = readStorage<UserProfile>("douyin-travel-profile");
@@ -41,21 +41,19 @@ export default function GeneratingPage() {
           ? {
               caseId: inspiration?.caseId,
               douyinUrl: inspiration?.douyinUrl,
+              destination: inspiration?.destination,
+              styleKeywords: inspiration?.styleKeywords,
+              sceneKeywords: inspiration?.sceneKeywords,
               profile
             }
           : undefined;
         const response = await generatePlan(request);
 
-        if (!active) {
-          return;
-        }
-
+        if (!active) return;
         setProgress(100);
-        router.push(`/result/${response.plan.id}`);
+        router.push("/result/" + response.plan.id);
       } catch {
-        if (active) {
-          setError("生成失败，请返回后重新尝试。");
-        }
+        if (active) setError("生成失败，请返回后重新尝试。");
       }
     }
 
@@ -79,16 +77,13 @@ export default function GeneratingPage() {
           <div className="h-3 overflow-hidden rounded-full bg-[#f1e6da]">
             <div
               className="h-full rounded-full bg-[#bf5f47] transition-all duration-300"
-              style={{ width: `${progress}%` }}
+              style={{ width: progress + "%" }}
             />
           </div>
           <p className="mt-3 text-sm font-semibold text-[#24211d]">{progress}%</p>
           <div className="mt-5 space-y-3">
             {generationSteps.map((step, index) => (
-              <div
-                key={step}
-                className="flex items-center gap-3 rounded-lg bg-[#fbf8f3] px-3 py-3 text-sm"
-              >
+              <div key={step} className="flex items-center gap-3 rounded-lg bg-[#fbf8f3] px-3 py-3 text-sm">
                 <span
                   className={
                     index <= activeIndex
@@ -125,3 +120,4 @@ function readStorage<T>(key: string): T | null {
     return null;
   }
 }
+

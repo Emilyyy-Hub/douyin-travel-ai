@@ -21,11 +21,16 @@ export interface UserProfile {
   skinTone?: string;
   outfitEffect?: string;
   hasUploadedPhoto: boolean;
+  tripDays: string;
+  gender: string;
 }
 
 export interface PlanRequest {
   caseId?: CaseId;
   douyinUrl?: string;
+  destination?: string;
+  styleKeywords?: string;
+  sceneKeywords?: string;
   profile: UserProfile;
 }
 
@@ -48,6 +53,9 @@ export interface Outfit {
   reason: string;
   items: OutfitItem[];
   totalPrice: number;
+  photoScore: boolean;
+  comfortScore: boolean;
+  slimScore: boolean;
   pose: string;
 }
 
@@ -68,6 +76,32 @@ export interface ActionItem {
   notes: string[];
 }
 
+export interface ProductItem {
+  id: string;
+  name: string;
+  category: "穿搭类" | "拍照类" | "旅行必备类";
+  reason: string;
+  priceRange: string;
+  priority: "必买" | "推荐" | "可选";
+  owned?: boolean;
+  imageUrl?: string;
+}
+
+export interface EnhancedPackingItem {
+  category: string;
+  label: "必带" | "推荐" | "可选" | "拍照加分项";
+  items: string[];
+}
+
+export interface PlanSummary {
+  destination: string;
+  tripDays: number;
+  gender: string;
+  highlights: string[];
+  checklist: string[];
+  totalBudget: number;
+}
+
 export interface Plan {
   id: string;
   destination: string;
@@ -75,7 +109,12 @@ export interface Plan {
   outfits: Outfit[];
   packingList: PackingItem[];
   actions: ActionItem[];
+  products: ProductItem[];
+  enhancedPacking: EnhancedPackingItem[];
   analysis: string;
+  tripDays: number;
+  gender: string;
+  summary: PlanSummary;
 }
 
 export interface GeneratePlanResponse {

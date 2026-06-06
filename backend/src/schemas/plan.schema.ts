@@ -1,0 +1,17 @@
+import { z } from "zod";
+
+export const userProfileSchema = z.object({
+  heightCm: z.number().int().min(120).max(230),
+  usualSize: z.string().min(1).max(20),
+  preferredStyle: z.string().min(1).max(60),
+  budget: z.number().min(0).max(100000),
+  photoGoal: z.string().min(1).max(120),
+  shoePreference: z.string().min(1).max(60),
+  coveragePreference: z.string().min(1).max(60),
+  skinTone: z.string().min(1).max(60).optional()
+});
+
+export const generatePlanSchema = z.object({
+  analysisId: z.string().min(1),
+  userProfile: userProfileSchema
+});

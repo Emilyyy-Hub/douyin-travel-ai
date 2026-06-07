@@ -1,7 +1,9 @@
 export type DemoCaseId = "dali-lake" | "suzhou-lanes" | "shanghai-night";
-export type SourceType = "demo" | "douyin_url";
+export type SourceType = "demo" | "douyin_url" | "manual_keywords";
 export type InferenceType = "extracted" | "inferred";
 export type PlanStatus = "processing" | "completed";
+export type ImagePlanStatus = "processing" | "completed" | "failed";
+export type ImageProvider = "doubao";
 
 export interface DemoCase {
   id: DemoCaseId;
@@ -146,6 +148,14 @@ export interface ActionItem {
   notes: string[];
 }
 
+export interface PlanRevision {
+  id: string;
+  instruction: string;
+  summary: string;
+  appliedChanges: string[];
+  createdAt: string;
+}
+
 export interface TravelPlan {
   planId: string;
   destination: string;
@@ -157,6 +167,7 @@ export interface TravelPlan {
   case: TravelCaseCompat;
   sceneAnalysis: SceneAnalysisCompat;
   actionCards: ActionItem[];
+  revisions?: PlanRevision[];
 }
 
 export interface PlanTask {
@@ -165,6 +176,35 @@ export interface PlanTask {
   progress: number;
   currentStep: string;
   plan?: TravelPlan;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface ImagePlanSummary {
+  style: string;
+  budget: number;
+  items: string[];
+  reason: string;
+}
+
+export interface ImagePlan {
+  id: string;
+  destination: string;
+  landmark: string;
+  imageUrl: string;
+  prompt: string;
+  outfitSummary: ImagePlanSummary;
+  wardrobeMatches: string[];
+  mallActionLabel: string;
+  provider: ImageProvider;
+}
+
+export interface ImagePlanTask {
+  id: string;
+  status: ImagePlanStatus;
+  progress: number;
+  currentStep: string;
+  plan?: ImagePlan;
   createdAt: string;
   updatedAt: string;
 }

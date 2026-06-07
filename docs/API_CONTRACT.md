@@ -1,6 +1,6 @@
 # Douyin Travel Action API Contract
 
-This contract describes the current backend MVP. The backend uses mock providers only: it does not download Douyin videos, crawl web pages, call real AI APIs, use a database, or execute shell commands with user input.
+This contract describes the current backend MVP. Video understanding and legacy plan generation still use mock providers. Image generation uses the configured Doubao Seedream-compatible API and does not fall back to local demo images when the provider fails. The backend does not download Douyin videos, crawl web pages, use a database, or execute shell commands with user input.
 
 ## Error Format
 
@@ -68,6 +68,17 @@ Douyin URL request:
 {
   "sourceType": "douyin_url",
   "videoUrl": "https://v.douyin.com/example"
+}
+```
+
+Manual keywords request:
+
+```json
+{
+  "sourceType": "manual_keywords",
+  "destination": "云南大理",
+  "styleKeywords": "清新松弛",
+  "sceneKeywords": "湖边 日落"
 }
 ```
 
@@ -206,3 +217,124 @@ Completed response `200`:
 ```
 
 The `plan` object includes the newer backend fields and frontend-compatible legacy fields from `frontend/src/types/plan.ts`.
+
+## POST /api/refine-plan
+
+Request:
+
+```json
+{
+  "planId": "plan_xxx",
+  "instruction": "更显高，不露肩，预算300"
+}
+```
+
+Response `200`:
+
+```json
+{
+  "planId": "plan_xxx",
+  "status": "completed",
+  "revision": {
+    "id": "revision_xxx",
+    "instruction": "更显高，不露肩，预算300",
+    "summary": "已按你的要求优化比例、降低露肤度并收紧补购预算。",
+    "appliedChanges": ["比例更利落", "规避露肩", "预算控制在300元以内"],
+    "createdAt": "2026-06-06T00:00:00.000Z"
+  },
+  "plan": {}
+}
+```
+
+Errors:
+
+- `404 PLAN_NOT_FOUND`: `planId` does not exist.
+- `409 PLAN_NOT_READY`: plan is still processing.
+- `400 VALIDATION_ERROR`: instruction is empty or too long.
+
+## POST /api/generate-image-plan
+
+Creates a generated outfit image plan task. `IMAGE_PROVIDER` must be `doubao`; demo templates only select destination and landmark text for the prompt, and are not used as image sources.
+
+Request:
+
+```json
+{
+  "destination": "上海",
+  "demoCaseId": "shanghai-night",
+  "styleKeywords": "都市利落",
+  "sceneKeywords": "外滩 蓝调时刻",
+  "userProfile": {
+    "heightCm": 163,
+    "usualSize": "M",
+    "preferredStyle": "都市利落",
+    "budget": 800,
+    "photoGoal": "显高且有镜头气场",
+    "shoePreference": "平底鞋",
+    "coveragePreference": "适度露肤",
+    "skinTone": "中性偏暖",
+    "tripDays": 3,
+    "gender": "女"
+  }
+}
+```
+
+Response `202`:
+
+```json
+{
+  "planId": "image_plan_xxx",
+  "status": "processing",
+  "resultUrl": "/api/image-plan-result/image_plan_xxx"
+}
+```
+
+## GET /api/image-plan-result/:id
+
+Processing response `200`:
+
+```json
+{
+  "id": "image_plan_xxx",
+  "status": "processing",
+  "progress": 60,
+  "currentStep": "正在调用豆包生图模型"
+}
+```
+
+Completed response `200`:
+
+```json
+{
+  "id": "image_plan_xxx",
+  "status": "completed",
+  "progress": 100,
+  "plan": {
+    "id": "image_plan_xxx",
+    "destination": "上海",
+    "landmark": "外滩与陆家嘴天际线",
+    "imageUrl": "/demo/shanghai.jpg",
+    "prompt": "为一位去上海旅行的年轻女性生成一张出片穿搭参考图...",
+    "outfitSummary": {
+      "style": "都市利落",
+      "budget": 800,
+      "items": ["短外套", "高腰直筒裤", "低跟鞋"],
+      "reason": "利落线条适合城市地标与蓝调时刻。"
+    },
+    "wardrobeMatches": [],
+    "mallActionLabel": "一键配衣",
+    "provider": "doubao"
+  }
+}
+```
+
+Failed response `200`:
+
+```json
+{
+  "id": "image_plan_xxx",
+  "status": "failed",
+  "progress": 0,
+  "currentStep": "图片方案生成失败"
+}
+```

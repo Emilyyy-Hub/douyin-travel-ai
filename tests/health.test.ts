@@ -213,4 +213,53 @@ describe("douyin travel action API", () => {
       ).toBe(true);
     }
   });
+
+  it("refines a completed plan with conversational instructions", async () => {
+    const completedResponse = await createCompletedPlan("dali-lake");
+    const planId = completedResponse.body.plan.planId;
+
+    const response = await request(app)
+      .post("/api/refine-plan")
+      .send({ planId, instruction: "更显高，不露肩，预算300，想更有电影感" })
+      .expect(200);
+
+    expect(response.body.planId).toBe(planId);
+    expect(response.body.revision.appliedChanges).toEqual(
+      expect.arrayContaining(["比例更利落", "降低露肤度", "降低网红感并增强电影感", "预算控制在300元以内"])
+    );
+    expect(response.body.plan.revisions).toHaveLength(1);
+    expect(response.body.plan.packingList.estimatedBudget).toBeLessThanOrEqual(300);
+    expect(response.body.plan.outfits[0].reason).toContain("不露肩");
+    expect(response.body.plan.outfits[0].pose).toContain("镜头略低于腰线");
+  });
+
+  it("rejects refinement before a plan is completed", async () => {
+    const analysisResponse = await request(app)
+      .post("/api/analyze-video")
+      .send({ sourceType: "demo", demoCaseId: "dali-lake" })
+      .expect(200);
+
+    const planResponse = await request(app)
+      .post("/api/generate-plan")
+      .send({
+        analysisId: analysisResponse.body.analysisId,
+        userProfile: {
+          heightCm: 163,
+          usualSize: "M",
+          preferredStyle: "娉曞紡鏉惧紱",
+          budget: 800,
+          photoGoal: "自然显高",
+          shoePreference: "平底鞋",
+          coveragePreference: "适度露肤"
+        }
+      })
+      .expect(202);
+
+    const response = await request(app)
+      .post("/api/refine-plan")
+      .send({ planId: planResponse.body.planId, instruction: "更显高" })
+      .expect(409);
+
+    expect(response.body.error.code).toBe("PLAN_NOT_READY");
+  });
 });

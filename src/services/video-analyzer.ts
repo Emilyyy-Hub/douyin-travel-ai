@@ -10,7 +10,14 @@ export interface AnalyzeDouyinUrlInput {
   videoUrl: string;
 }
 
-export type AnalyzeVideoInput = AnalyzeDemoInput | AnalyzeDouyinUrlInput;
+export interface AnalyzeManualKeywordsInput {
+  sourceType: "manual_keywords";
+  destination: string;
+  styleKeywords?: string;
+  sceneKeywords?: string;
+}
+
+export type AnalyzeVideoInput = AnalyzeDemoInput | AnalyzeDouyinUrlInput | AnalyzeManualKeywordsInput;
 
 export interface VideoAnalyzer {
   analyze(input: AnalyzeVideoInput): Promise<VideoAnalysis>;

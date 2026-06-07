@@ -1,16 +1,120 @@
 @import "tailwindcss";
 
-:root {
-  --background: #fbf8f3;
-  --foreground: #24211d;
-  --muted: #756f68;
-  --line: #e8ded1;
-  --accent: #bf5f47;
-  --accent-strong: #9f422e;
-  --sage: #607d6c;
-  --sky: #6f91b8;
+@theme {
+  /* ===== Color Tokens: Paper & Ink (Material Design 3) ===== */
+  --color-primary: #252844;
+  --color-on-primary: #ffffff;
+  --color-primary-container: #3b3e5b;
+  --color-on-primary-container: #a7a9cc;
+  --color-primary-fixed: #dfe0ff;
+  --color-primary-fixed-dim: #c2c4e7;
+  --color-on-primary-fixed: #161934;
+  --color-on-primary-fixed-variant: #424562;
+  --color-inverse-primary: #c2c4e7;
+
+  --color-secondary: #5e5b7a;
+  --color-on-secondary: #ffffff;
+  --color-secondary-container: #ded9fd;
+  --color-on-secondary-container: #605d7c;
+  --color-secondary-fixed: #e4dfff;
+  --color-secondary-fixed-dim: #c7c2e6;
+  --color-on-secondary-fixed: #1b1833;
+  --color-on-secondary-fixed-variant: #464361;
+
+  --color-tertiary: #382623;
+  --color-on-tertiary: #ffffff;
+  --color-tertiary-container: #503b38;
+  --color-on-tertiary-container: #c2a6a1;
+  --color-tertiary-fixed: #fbdcd6;
+  --color-tertiary-fixed-dim: #dec0bb;
+  --color-on-tertiary-fixed: #281715;
+  --color-on-tertiary-fixed-variant: #57423e;
+
+  --color-error: #ba1a1a;
+  --color-on-error: #ffffff;
+  --color-error-container: #ffdad6;
+  --color-on-error-container: #93000a;
+
+  --color-surface: #faf9f8;
+  --color-surface-dim: #dadad9;
+  --color-surface-bright: #faf9f8;
+  --color-surface-container-lowest: #ffffff;
+  --color-surface-container-low: #f4f3f2;
+  --color-surface-container: #eeeeed;
+  --color-surface-container-high: #e9e8e7;
+  --color-surface-container-highest: #e3e2e1;
+  --color-on-surface: #1a1c1c;
+  --color-on-surface-variant: #46464d;
+  --color-surface-variant: #e3e2e1;
+  --color-surface-tint: #595c7b;
+
+  --color-outline: #77767e;
+  --color-outline-variant: #c7c5ce;
+
+  --color-background: #faf9f8;
+  --color-on-background: #1a1c1c;
+
+  --color-inverse-surface: #2f3130;
+  --color-inverse-on-surface: #f1f0f0;
+
+  /* ===== Typography: Font Families ===== */
+  --font-display-lg: "Plus Jakarta Sans", sans-serif;
+  --font-headline-lg: "Plus Jakarta Sans", sans-serif;
+  --font-headline-lg-mobile: "Plus Jakarta Sans", sans-serif;
+  --font-title-md: "Plus Jakarta Sans", sans-serif;
+  --font-label-sm: "Plus Jakarta Sans", sans-serif;
+  --font-body-md: "Work Sans", sans-serif;
+  --font-body-lg: "Work Sans", sans-serif;
+
+  /* ===== Typography: Font Sizes ===== */
+  --text-display-lg: 48px;
+  --text-display-lg--line-height: 56px;
+  --text-display-lg--letter-spacing: -0.02em;
+  --text-display-lg--font-weight: 700;
+
+  --text-headline-lg: 32px;
+  --text-headline-lg--line-height: 40px;
+  --text-headline-lg--font-weight: 600;
+
+  --text-headline-lg-mobile: 28px;
+  --text-headline-lg-mobile--line-height: 36px;
+  --text-headline-lg-mobile--font-weight: 600;
+
+  --text-title-md: 20px;
+  --text-title-md--line-height: 28px;
+  --text-title-md--font-weight: 600;
+
+  --text-body-lg: 18px;
+  --text-body-lg--line-height: 28px;
+  --text-body-lg--font-weight: 400;
+
+  --text-body-md: 16px;
+  --text-body-md--line-height: 24px;
+  --text-body-md--font-weight: 400;
+
+  --text-label-sm: 13px;
+  --text-label-sm--line-height: 16px;
+  --text-label-sm--letter-spacing: 0.05em;
+  --text-label-sm--font-weight: 500;
+
+  /* ===== Border Radius ===== */
+  --radius-sm: 0.25rem;
+  --radius-DEFAULT: 0.5rem;
+  --radius-md: 0.75rem;
+  --radius-lg: 1rem;
+  --radius-xl: 1.5rem;
+  --radius-full: 9999px;
+
+  /* ===== Spacing ===== */
+  --spacing-base: 8px;
+  --spacing-margin-page: 24px;
+  --spacing-gutter: 16px;
+  --spacing-stack-sm: 12px;
+  --spacing-stack-md: 24px;
+  --spacing-stack-lg: 40px;
 }
 
+/* ===== Base Styles ===== */
 * {
   box-sizing: border-box;
 }
@@ -21,9 +125,12 @@ html {
 
 body {
   margin: 0;
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background:
+    radial-gradient(#25284411 1px, transparent 1px),
+    var(--color-background);
+  background-size: 32px 32px;
+  color: var(--color-on-surface);
+  font-family: var(--font-body-md);
 }
 
 button,
@@ -38,11 +145,173 @@ a {
   text-decoration: none;
 }
 
+/* ===== Material Symbols ===== */
+.material-symbols-outlined {
+  font-family: "Material Symbols Outlined";
+  font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+  user-select: none;
+  display: inline-block;
+  line-height: 1;
+}
+
+/* ===== Focus Ring ===== */
 .focus-ring {
   outline: 2px solid transparent;
   outline-offset: 2px;
 }
 
 .focus-ring:focus-visible {
-  outline-color: var(--accent);
+  outline-color: var(--color-primary);
+}
+
+/* ===== Hand-Drawn Card Borders ===== */
+.hand-drawn-border {
+  border: 1.5px solid var(--color-primary);
+  position: relative;
+}
+
+.hand-drawn-border::after {
+  content: '';
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  right: -2px;
+  bottom: -2px;
+  border: 1px solid rgba(37, 40, 68, 0.15);
+  z-index: -1;
+  border-radius: inherit;
+  pointer-events: none;
+}
+
+.hand-drawn-border-sm {
+  border: 1px solid var(--color-primary);
+  position: relative;
+}
+
+.hand-drawn-border-sm::after {
+  content: '';
+  position: absolute;
+  top: 1px;
+  left: 1px;
+  right: -1px;
+  bottom: -1px;
+  border: 1px solid rgba(37, 40, 68, 0.12);
+  z-index: -1;
+  border-radius: inherit;
+  pointer-events: none;
+}
+
+/* Ghost border variant — visible offset border outside */
+.ghost-border {
+  position: relative;
+}
+
+.ghost-border::after {
+  content: '';
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  right: -2px;
+  bottom: -2px;
+  border: 1.5px solid var(--color-primary);
+  z-index: -1;
+  border-radius: inherit;
+  pointer-events: none;
+}
+
+/* ===== Journal Cards (with shadow offset) ===== */
+.journal-card {
+  border: 1.5px solid var(--color-primary);
+  box-shadow: 4px 4px 0 0 var(--color-primary);
+}
+
+.journal-card-sm {
+  border: 1px solid var(--color-primary);
+  box-shadow: 2px 2px 0 0 var(--color-primary);
+}
+
+/* ===== Hover Micro-interactions ===== */
+.journal-hover {
+  transition: transform 160ms ease, box-shadow 160ms ease, background-color 160ms ease;
+}
+
+.journal-hover:hover {
+  transform: translate(-1px, -1px);
+  box-shadow: 5px 5px 0 0 var(--color-primary);
+}
+
+.sketch-hover {
+  transition: transform 160ms ease, box-shadow 160ms ease, background-color 160ms ease;
+}
+
+.sketch-hover:hover {
+  transform: translate(-1px, -1px);
+  box-shadow: 3px 3px 0 0 var(--color-primary);
+}
+
+/* ===== Journal Divider ===== */
+.journal-divider {
+  height: 2px;
+  background: repeating-linear-gradient(
+    to right,
+    var(--color-primary) 0,
+    var(--color-primary) 10px,
+    transparent 10px,
+    transparent 16px
+  );
+}
+
+/* ===== Hand-Drawn Line (SVG wiggle) ===== */
+.hand-drawn-line {
+  background-image: url("data:image/svg+xml,%3Csvg width='1000' height='2' viewBox='0 0 1000 2' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 1C150 0.5 350 1.5 500 1C650 0.5 850 1.5 1000 1' stroke='%23252844' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat: repeat-x;
+  height: 2px;
+  width: 100%;
+}
+
+/* ===== Scribble Underline ===== */
+.scribble-underline {
+  background-image: linear-gradient(120deg, transparent 0%, transparent 50%, var(--color-primary-container) 50%);
+  background-repeat: no-repeat;
+  background-size: 100% 2px;
+  background-position: 0 100%;
+}
+
+/* ===== Range Slider Styling ===== */
+input[type="range"] {
+  -webkit-appearance: none;
+  width: 100%;
+  background: transparent;
+}
+
+input[type="range"]::-webkit-slider-runnable-track {
+  width: 100%;
+  height: 2px;
+  background: var(--color-primary);
+}
+
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  height: 16px;
+  width: 16px;
+  border-radius: 50%;
+  background: var(--color-primary);
+  margin-top: -7px;
+  cursor: pointer;
+  border: 2px solid #ffffff;
+}
+
+/* ===== Safe Area Bottom Padding ===== */
+.safe-bottom {
+  padding-bottom: max(0.75rem, env(safe-area-inset-bottom));
+}
+
+/* ===== Scrollbar Hide Utility ===== */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
 }

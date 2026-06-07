@@ -7,17 +7,17 @@ interface ActionCardProps {
 
 export function ActionCard({ action }: ActionCardProps) {
   return (
-    <Card className="space-y-3">
+    <Card variant="journal" className="space-y-3">
       <div>
-        <p className="text-xs font-semibold text-[#bf5f47]">{action.time}</p>
-        <h3 className="mt-1 text-lg font-bold text-[#24211d]">{action.scene}</h3>
+        <p className="font-label-sm text-label-sm font-bold text-secondary">{action.time}</p>
+        <h3 className="mt-1 font-title-md text-primary">{action.scene}</h3>
       </div>
       <ActionLine label="机位" value={action.cameraSpot} />
       <ActionLine label="构图" value={action.composition} />
       <ActionLine label="拍照动作" value={action.pose} />
       <div>
-        <p className="text-xs font-semibold text-[#756f68]">注意事项</p>
-        <ul className="mt-2 space-y-1 text-sm leading-6 text-[#4a433c]">
+        <p className="font-label-sm text-label-sm font-bold text-on-surface-variant">注意事项</p>
+        <ul className="mt-2 space-y-1 font-body-md text-on-surface">
           {action.notes.length > 0 ? (
             action.notes.map((note) => <li key={note}>· {note}</li>)
           ) : (
@@ -32,8 +32,8 @@ export function ActionCard({ action }: ActionCardProps) {
 function ActionLine({ label, value }: { label: string; value: string }) {
   return (
     <div>
-      <p className="text-xs font-semibold text-[#756f68]">{label}</p>
-      <p className="mt-1 text-sm leading-6 text-[#24211d]">{value}</p>
+      <p className="font-label-sm text-label-sm font-bold text-on-surface-variant">{label}</p>
+      <p className="mt-1 font-body-md text-on-surface">{value}</p>
     </div>
   );
 }

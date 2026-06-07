@@ -5,15 +5,15 @@ import { useRouter } from "next/navigation";
 import { AppShell } from "@/components/layout/app-shell";
 import { LinkButton } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { generatePlan } from "@/lib/api";
+import { generateImagePlan } from "@/lib/api";
 import { clamp } from "@/lib/utils";
 import type { CaseId, PlanRequest, UserProfile } from "@/types/plan";
 
 const generationSteps = [
-  "正在理解视频场景",
-  "正在提取出片机位",
-  "正在匹配穿搭风格",
-  "正在生成行动方案"
+  "正在整理目的地地标",
+  "正在生成穿搭提示词",
+  "正在调用豆包生图模型",
+  "正在准备一键配衣入口"
 ];
 
 export default function GeneratingPage() {
@@ -47,13 +47,17 @@ export default function GeneratingPage() {
               profile
             }
           : undefined;
-        const response = await generatePlan(request);
+        const response = await generateImagePlan(request);
 
         if (!active) return;
         setProgress(100);
         router.push("/result/" + response.plan.id);
       } catch {
-        if (active) setError("生成失败，请返回后重新尝试。");
+        window.clearInterval(interval);
+        if (active) {
+          setProgress(0);
+          setError("生成失败，请检查豆包配置后重试。");
+        }
       }
     }
 
@@ -68,37 +72,63 @@ export default function GeneratingPage() {
   return (
     <AppShell eyebrow="生成中">
       <div className="mx-auto flex min-h-[70vh] max-w-2xl flex-col justify-center space-y-6">
+        {/* ===== Header ===== */}
         <div>
-          <p className="text-sm font-semibold text-[#bf5f47]">第 3 步</p>
-          <h1 className="mt-1 text-3xl font-bold text-[#24211d]">正在生成你的出游行动方案</h1>
-          <p className="mt-2 text-sm leading-6 text-[#756f68]">AI正在分析旅游场景...</p>
+          <p className="font-label-sm text-label-sm font-bold text-secondary">第 3 步</p>
+          <h1 className="mt-1 font-headline-lg-mobile text-headline-lg-mobile text-primary">
+            正在生成你的出游行动方案
+          </h1>
+          <p className="mt-2 font-body-md text-on-surface-variant">
+            AI 正在生成你的旅行穿搭参考图...
+          </p>
         </div>
-        <Card>
-          <div className="h-3 overflow-hidden rounded-full bg-[#f1e6da]">
+
+        {/* ===== Progress Card ===== */}
+        <Card variant="journal">
+          {/* Progress bar */}
+          <div className="h-3 overflow-hidden rounded-full bg-surface-container-high">
             <div
-              className="h-full rounded-full bg-[#bf5f47] transition-all duration-300"
+              className="h-full rounded-full bg-primary transition-all duration-300"
               style={{ width: progress + "%" }}
             />
           </div>
-          <p className="mt-3 text-sm font-semibold text-[#24211d]">{progress}%</p>
+          <p className="mt-3 font-label-sm text-label-sm font-bold text-primary">
+            {progress}%
+          </p>
+
+          {/* Step indicators */}
           <div className="mt-5 space-y-3">
             {generationSteps.map((step, index) => (
-              <div key={step} className="flex items-center gap-3 rounded-lg bg-[#fbf8f3] px-3 py-3 text-sm">
+              <div
+                key={step}
+                className="flex items-center gap-3 rounded-lg bg-surface-container-low px-3 py-3 text-body-md"
+              >
                 <span
                   className={
                     index <= activeIndex
-                      ? "h-3 w-3 rounded-full bg-[#607d6c]"
-                      : "h-3 w-3 rounded-full bg-[#d8cabc]"
+                      ? "h-3 w-3 rounded-full bg-secondary"
+                      : "h-3 w-3 rounded-full bg-outline-variant"
                   }
                 />
-                <span className={index <= activeIndex ? "font-semibold text-[#24211d]" : "text-[#756f68]"}>
+                <span
+                  className={
+                    index <= activeIndex
+                      ? "font-semibold text-on-surface"
+                      : "text-on-surface-variant"
+                  }
+                >
                   {step}
                 </span>
               </div>
             ))}
           </div>
-          {error ? <p className="mt-4 text-sm font-semibold text-[#9f422e]">{error}</p> : null}
+
+          {error ? (
+            <p className="mt-4 font-label-sm text-label-sm font-bold text-error">{error}</p>
+          ) : null}
         </Card>
+
+        {/* ===== Actions ===== */}
         <div className="flex flex-col gap-3 sm:flex-row">
           <LinkButton href="/profile" variant="secondary" className="w-full sm:w-auto">
             返回修改信息
@@ -120,4 +150,3 @@ function readStorage<T>(key: string): T | null {
     return null;
   }
 }
-

@@ -17,9 +17,9 @@ export function StateView({
   onAction
 }: StateViewProps) {
   return (
-    <Card className="text-center">
-      <p className="text-base font-semibold text-[#24211d]">{title}</p>
-      <p className="mt-2 text-sm leading-6 text-[#756f68]">{description}</p>
+    <Card variant="journal" className="text-center">
+      <p className="text-title-md font-title-md text-primary">{title}</p>
+      <p className="mt-2 text-body-md text-on-surface-variant">{description}</p>
       {actionLabel && actionHref ? (
         <LinkButton href={actionHref} className="mt-4">
           {actionLabel}

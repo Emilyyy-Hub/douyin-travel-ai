@@ -1,4 +1,4 @@
-export type CaseId = "dali-sunset" | "suzhou-lanes" | "shanghai-night";
+export type CaseId = "dali-lake" | "dali-sunset" | "suzhou-lanes" | "shanghai-night";
 
 export interface TravelCase {
   id: CaseId;
@@ -102,6 +102,14 @@ export interface PlanSummary {
   totalBudget: number;
 }
 
+export interface PlanRevision {
+  id: string;
+  instruction: string;
+  summary: string;
+  appliedChanges: string[];
+  createdAt: string;
+}
+
 export interface Plan {
   id: string;
   destination: string;
@@ -115,6 +123,7 @@ export interface Plan {
   tripDays: number;
   gender: string;
   summary: PlanSummary;
+  revisions?: PlanRevision[];
 }
 
 export interface GeneratePlanResponse {
@@ -125,6 +134,41 @@ export interface GeneratePlanResponse {
 export interface GetPlanResponse {
   success: true;
   plan: Plan;
+}
+
+export interface RefinePlanResponse {
+  success: true;
+  plan: Plan;
+  revision: PlanRevision;
+}
+
+export interface ImagePlanSummary {
+  style: string;
+  budget: number;
+  items: string[];
+  reason: string;
+}
+
+export interface ImagePlan {
+  id: string;
+  destination: string;
+  landmark: string;
+  imageUrl: string;
+  prompt: string;
+  outfitSummary: ImagePlanSummary;
+  wardrobeMatches: string[];
+  mallActionLabel: string;
+  provider: "doubao";
+}
+
+export interface GenerateImagePlanResponse {
+  success: true;
+  plan: ImagePlan;
+}
+
+export interface GetImagePlanResponse {
+  success: true;
+  plan: ImagePlan;
 }
 
 export interface SceneAnalysis {

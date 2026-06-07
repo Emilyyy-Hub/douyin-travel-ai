@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useEffect, useState, useCallback } from "react";
 import { useParams } from "next/navigation";
@@ -8,28 +8,38 @@ import { PackingList } from "@/components/result/packing-list";
 import { SceneAnalysis } from "@/components/result/scene-analysis";
 import { ProductCatalog } from "@/components/result/product-catalog";
 import { PlanSummaryCard } from "@/components/result/plan-summary";
+import { PlanRefinement } from "@/components/result/plan-refinement";
 import { AppShell } from "@/components/layout/app-shell";
 import { Button, LinkButton } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { StateView } from "@/components/ui/state-view";
-import { getPlanById } from "@/lib/api";
-import type { Plan, EnhancedPackingItem } from "@/types/plan";
+import { getImagePlanById, getPlanById, refinePlan } from "@/lib/api";
+import type { ImagePlan, Plan, EnhancedPackingItem } from "@/types/plan";
 
 export default function ResultPage() {
   const params = useParams<{ id: string }>();
   const [plan, setPlan] = useState<Plan | null>(null);
+  const [imagePlan, setImagePlan] = useState<ImagePlan | null>(null);
   const [status, setStatus] = useState<"loading" | "success" | "error">("loading");
   const [copied, setCopied] = useState(false);
 
   useEffect(() => {
     let active = true;
-    getPlanById(params.id)
+    getImagePlanById(params.id)
       .then((result) => {
         if (!active) return;
-        setPlan(result?.plan ?? null);
+        setImagePlan(result?.plan ?? null);
         setStatus("success");
       })
-      .catch(() => { if (active) setStatus("error"); });
+      .catch(() => {
+        getPlanById(params.id)
+          .then((result) => {
+            if (!active) return;
+            setPlan(result?.plan ?? null);
+            setStatus("success");
+          })
+          .catch(() => { if (active) setStatus("error"); });
+      });
     return () => { active = false; };
   }, [params.id]);
 
@@ -54,6 +64,12 @@ export default function ResultPage() {
     URL.revokeObjectURL(url);
   }, [plan]);
 
+  const handleRefine = useCallback(async (instruction: string) => {
+    if (!plan) return;
+    const response = await refinePlan(plan.id, instruction);
+    setPlan(response.plan);
+  }, [plan]);
+
   return (
     <AppShell eyebrow="行动方案">
       <div className="mx-auto max-w-4xl space-y-8">
@@ -61,18 +77,35 @@ export default function ResultPage() {
           <StateView title="正在加载方案" description="正在整理场景分析、穿搭和打包清单。" />
         ) : null}
         {status === "error" ? (
-          <StateView title="方案加载失败" description="请返回重新生成一次方案。" actionLabel="重新开始" actionHref="/" />
+          <StateView
+            title="方案加载失败"
+            description="请返回重新生成一次方案。"
+            actionLabel="重新开始"
+            actionHref="/"
+          />
         ) : null}
-        {status === "success" && plan === null ? (
-          <StateView title="暂无方案" description="没有找到对应的 Mock 方案。" actionLabel="重新开始" actionHref="/" />
+        {status === "success" && plan === null && imagePlan === null ? (
+          <StateView
+            title="暂无方案"
+            description="没有找到对应的方案。"
+            actionLabel="重新开始"
+            actionHref="/"
+          />
+        ) : null}
+        {status === "success" && imagePlan ? (
+          <ImagePlanResult plan={imagePlan} />
         ) : null}
         {status === "success" && plan ? (
           <>
             {/* Header with action buttons */}
             <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
               <div>
-                <p className="text-sm font-semibold text-[#bf5f47]">{plan.destination} · {plan.tripDays}天 · {plan.gender}性</p>
-                <h1 className="mt-1 text-3xl font-bold text-[#24211d]">你的穿搭与出片行动方案</h1>
+                <p className="font-label-sm text-label-sm font-bold text-secondary">
+                  {plan.destination} · {plan.tripDays}天 · {plan.gender}性
+                </p>
+                <h1 className="mt-1 font-headline-lg-mobile text-headline-lg-mobile text-primary">
+                  你的穿搭与出片行动方案
+                </h1>
               </div>
               <div className="flex gap-2">
                 <Button type="button" variant="secondary" onClick={handleCopy}>
@@ -87,14 +120,19 @@ export default function ResultPage() {
               </div>
             </div>
 
+            <PlanRefinement
+              latestRevision={plan.revisions?.[plan.revisions.length - 1]}
+              onSubmit={handleRefine}
+            />
+
             {/* 1. Scene Analysis Card */}
             <SceneAnalysis destination={plan.destination} weather={plan.weather} analysis={plan.analysis} />
 
-            {/* 2. Outfit Plan Card */}
+            {/* 2. Outfit Plan Cards */}
             <section className="space-y-4">
               <div>
-                <p className="text-sm font-semibold text-[#bf5f47]">完整穿搭方案</p>
-                <h2 className="mt-1 text-2xl font-bold text-[#24211d]">按场景直接执行</h2>
+                <p className="font-label-sm text-label-sm font-bold text-secondary">完整穿搭方案</p>
+                <h2 className="mt-1 font-headline-lg text-headline-lg text-primary">按场景直接执行</h2>
               </div>
               {plan.outfits.length > 0 ? (
                 <div className="grid gap-5 lg:grid-cols-3">
@@ -110,8 +148,8 @@ export default function ResultPage() {
             {/* 3. Photo Action Cards */}
             <section className="space-y-4">
               <div>
-                <p className="text-sm font-semibold text-[#bf5f47]">出片行动卡</p>
-                <h2 className="mt-1 text-2xl font-bold text-[#24211d]">拍摄时照着做</h2>
+                <p className="font-label-sm text-label-sm font-bold text-secondary">出片行动卡</p>
+                <h2 className="mt-1 font-headline-lg text-headline-lg text-primary">拍摄时照着做</h2>
               </div>
               {plan.actions.length > 0 ? (
                 <div className="grid gap-4 md:grid-cols-3">
@@ -153,32 +191,37 @@ function EnhancedPackingSection({ items }: { items: EnhancedPackingItem[] }) {
   }, {});
 
   const labelColors: Record<string, string> = {
-    "必带": "bg-[#bf5f47] text-white",
-    "推荐": "bg-[#e9f0ec] text-[#607d6c]",
-    "可选": "bg-[#f5eee6] text-[#756f68]",
-    "拍照加分项": "bg-[#fef3c7] text-[#b45309]"
+    "必带": "bg-primary text-on-primary",
+    "推荐": "bg-secondary-container text-secondary",
+    "可选": "bg-surface-container-high text-on-surface-variant",
+    "拍照加分项": "bg-tertiary-fixed text-tertiary"
   };
 
   return (
     <section className="space-y-4">
       <div>
-        <p className="text-sm font-semibold text-[#bf5f47]">旅行打包清单</p>
-        <h2 className="mt-1 text-2xl font-bold text-[#24211d]">按出行前直接检查</h2>
+        <p className="font-label-sm text-label-sm font-bold text-secondary">旅行打包清单</p>
+        <h2 className="mt-1 font-headline-lg text-headline-lg text-primary">按出行前直接检查</h2>
       </div>
       <div className="grid gap-4 md:grid-cols-2">
         {Object.entries(grouped).map(([category, entries]) => (
-          <Card key={category}>
-            <p className="text-base font-bold text-[#24211d]">{category}</p>
+          <Card key={category} variant="journal">
+            <p className="font-title-md text-primary">{category}</p>
             <div className="mt-3 space-y-2">
               {entries.map((entry, idx) => (
                 <div key={idx}>
-                  <span className={"inline-block rounded px-2 py-0.5 text-xs font-semibold " + (labelColors[entry.label] || "bg-[#f5eee6] text-[#756f68]")}>
+                  <span
+                    className={
+                      "inline-block rounded px-2 py-0.5 font-label-sm text-label-sm font-semibold " +
+                      (labelColors[entry.label] || "bg-surface-container-high text-on-surface-variant")
+                    }
+                  >
                     {entry.label}
                   </span>
-                  <ul className="mt-1.5 text-sm leading-6 text-[#4a433c] space-y-0.5">
+                  <ul className="mt-1.5 font-body-md text-on-surface space-y-0.5">
                     {entry.items.map((item, i) => (
                       <li key={i} className="flex items-center gap-1.5">
-                        <span className="h-1 w-1 rounded-full bg-[#607d6c] shrink-0" />
+                        <span className="h-1 w-1 rounded-full bg-secondary shrink-0" />
                         {item}
                       </li>
                     ))}
@@ -190,6 +233,66 @@ function EnhancedPackingSection({ items }: { items: EnhancedPackingItem[] }) {
         ))}
       </div>
     </section>
+  );
+}
+
+function ImagePlanResult({ plan }: { plan: ImagePlan }) {
+  return (
+    <>
+      <div>
+        <p className="font-label-sm text-label-sm font-bold text-secondary">
+          {plan.destination} · {plan.landmark}
+        </p>
+        <h1 className="mt-1 font-headline-lg-mobile text-headline-lg-mobile text-primary">
+          你的旅行穿搭参考图
+        </h1>
+      </div>
+
+      <section className="grid gap-5 lg:grid-cols-[1.1fr_0.9fr]">
+        <Card variant="journal" className="p-0 overflow-hidden">
+          <img
+            src={plan.imageUrl}
+            alt={`${plan.destination}旅行穿搭参考图`}
+            className="aspect-[4/5] w-full object-cover"
+          />
+        </Card>
+
+        <div className="space-y-5">
+          <Card variant="journal" className="space-y-4">
+            <div>
+              <p className="font-label-sm text-label-sm font-bold text-secondary">搭配摘要</p>
+              <h2 className="mt-1 font-title-md text-primary">{plan.outfitSummary.style}</h2>
+            </div>
+            <p className="font-body-md text-on-surface-variant">
+              {plan.outfitSummary.reason}
+            </p>
+            <div className="flex flex-wrap gap-2">
+              {plan.outfitSummary.items.map((item) => (
+                <span key={item} className="rounded-full bg-surface-container-low px-3 py-1 font-label-sm text-label-sm text-on-surface-variant">
+                  {item}
+                </span>
+              ))}
+            </div>
+            <p className="font-body-md text-primary">
+              参考预算：¥{plan.outfitSummary.budget}
+            </p>
+          </Card>
+
+          <Card variant="journal" className="space-y-4">
+            <div>
+              <p className="font-label-sm text-label-sm font-bold text-secondary">衣柜匹配</p>
+              <h2 className="mt-1 font-title-md text-primary">当前衣柜暂无可直接复用单品</h2>
+            </div>
+            <p className="font-body-md text-on-surface-variant">
+              可以根据这张参考图寻找相似风格单品，后续再回到衣柜中收录常用款。
+            </p>
+            <LinkButton href="/mall-redirect" className="w-full !text-white">
+              {plan.mallActionLabel}
+            </LinkButton>
+          </Card>
+        </div>
+      </section>
+    </>
   );
 }
 
@@ -234,4 +337,3 @@ function buildCopyText(plan: Plan): string {
   lines.push("◆ 预算：¥" + plan.summary.totalBudget);
   return lines.join("\n");
 }
-

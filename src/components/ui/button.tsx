@@ -5,9 +5,12 @@ import { cn } from "@/lib/utils";
 type ButtonVariant = "primary" | "secondary" | "ghost";
 
 const variantClasses: Record<ButtonVariant, string> = {
-  primary: "bg-[#bf5f47] text-white hover:bg-[#9f422e]",
-  secondary: "border border-[#d8cabc] bg-white text-[#24211d] hover:bg-[#f5eee6]",
-  ghost: "text-[#756f68] hover:bg-[#f5eee6]"
+  primary:
+    "bg-primary text-on-primary hover:bg-primary-container transition-colors",
+  secondary:
+    "bg-surface-container-lowest border border-primary text-primary hover:bg-surface-container-low transition-colors",
+  ghost:
+    "text-on-surface-variant hover:bg-surface-container-low hover:text-primary transition-colors"
 };
 
 interface BaseButtonProps {
@@ -29,7 +32,8 @@ export function Button({
   return (
     <button
       className={cn(
-        "focus-ring inline-flex min-h-11 items-center justify-center rounded-lg px-5 py-2.5 text-sm font-semibold transition-colors disabled:cursor-not-allowed disabled:opacity-50",
+        "focus-ring inline-flex min-h-12 items-center justify-center rounded-full px-6 py-3 text-label-sm font-semibold transition-all disabled:cursor-not-allowed disabled:opacity-50",
+        "sketch-hover",
         variantClasses[variant],
         className
       )}
@@ -50,7 +54,8 @@ export function LinkButton({
     <Link
       href={href}
       className={cn(
-        "focus-ring inline-flex min-h-11 items-center justify-center rounded-lg px-5 py-2.5 text-sm font-semibold transition-colors",
+        "focus-ring inline-flex min-h-12 items-center justify-center rounded-full px-6 py-3 text-label-sm font-semibold transition-all",
+        "sketch-hover",
         variantClasses[variant],
         className
       )}

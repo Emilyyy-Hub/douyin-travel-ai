@@ -10,18 +10,18 @@ export function SceneAnalysis({ destination, weather, analysis }: SceneAnalysisP
   return (
     <section className="space-y-4">
       <div>
-        <p className="text-sm font-semibold text-[#bf5f47]">旅行场景分析</p>
-        <h1 className="mt-1 text-2xl font-bold text-[#24211d]">{destination}</h1>
+        <p className="font-label-sm text-label-sm font-bold text-secondary">旅行场景分析</p>
+        <h1 className="mt-1 font-title-md text-title-md text-primary">{destination}</h1>
       </div>
-      <Card>
+      <Card variant="journal">
         <div className="space-y-4">
           <div>
-            <p className="text-xs font-semibold text-[#756f68]">天气建议</p>
-            <p className="mt-1 text-sm leading-6 text-[#24211d]">{weather}</p>
+            <p className="font-label-sm text-label-sm font-bold text-on-surface-variant">天气建议</p>
+            <p className="mt-1 font-body-md text-on-surface">{weather}</p>
           </div>
           <div>
-            <p className="text-xs font-semibold text-[#756f68]">AI 分析</p>
-            <p className="mt-1 text-sm leading-6 text-[#24211d]">{analysis}</p>
+            <p className="font-label-sm text-label-sm font-bold text-on-surface-variant">AI 分析</p>
+            <p className="mt-1 font-body-md text-on-surface">{analysis}</p>
           </div>
         </div>
       </Card>

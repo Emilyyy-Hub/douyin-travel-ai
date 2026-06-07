@@ -3,7 +3,7 @@ import { Router } from "express";
 import { AppError } from "../errors/app-error";
 import { asyncHandler } from "../middleware/async-handler";
 import { generateImagePlanSchema } from "../schemas/image-plan.schema";
-import { GeminiBananaImageGenerator } from "../services/gemini-banana-image-generator";
+import { DoubaoImageGenerator } from "../services/doubao-image-generator";
 import type { ImageGenerator } from "../services/image-generator";
 import {
   completeImagePlanTask,
@@ -15,7 +15,7 @@ import {
 
 export const imagePlansRouter = Router();
 
-const imageGenerator: ImageGenerator = new GeminiBananaImageGenerator();
+const imageGenerator: ImageGenerator = new DoubaoImageGenerator();
 
 function scheduleTaskUpdate(callback: () => void, delayMs: number): void {
   const timer = setTimeout(callback, delayMs);
@@ -33,7 +33,7 @@ imagePlansRouter.post(
     }, 150);
 
     scheduleTaskUpdate(() => {
-      updateImagePlanProgress(task.id, 65, "正在调用 Gemini 生图模型");
+      updateImagePlanProgress(task.id, 65, "正在调用豆包生图模型");
     }, 350);
 
     scheduleTaskUpdate(() => {

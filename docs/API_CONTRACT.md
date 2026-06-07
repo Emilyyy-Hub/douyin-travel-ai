@@ -1,6 +1,6 @@
 # Douyin Travel Action API Contract
 
-This contract describes the current backend MVP. Video understanding and legacy plan generation still use mock providers. Image generation uses the configured Gemini Nano Banana-compatible API and does not fall back to local demo images when the provider fails. The backend does not download Douyin videos, crawl web pages, use a database, or execute shell commands with user input.
+This contract describes the current backend MVP. Video understanding and legacy plan generation still use mock providers. Image generation uses the configured Doubao Seedream-compatible API and does not fall back to local demo images when the provider fails. The backend does not download Douyin videos, crawl web pages, use a database, or execute shell commands with user input.
 
 ## Error Format
 
@@ -254,7 +254,7 @@ Errors:
 
 ## POST /api/generate-image-plan
 
-Creates a generated outfit image plan task. `IMAGE_PROVIDER` must be `gemini_banana`; demo templates only select destination and landmark text for the prompt, and are not used as image sources.
+Creates a generated outfit image plan task. `IMAGE_PROVIDER` must be `doubao`; demo templates only select destination and landmark text for the prompt, and are not used as image sources.
 
 Request:
 
@@ -298,7 +298,7 @@ Processing response `200`:
   "id": "image_plan_xxx",
   "status": "processing",
   "progress": 60,
-  "currentStep": "正在调用 Gemini 生图模型"
+  "currentStep": "正在调用豆包生图模型"
 }
 ```
 
@@ -323,7 +323,7 @@ Completed response `200`:
     },
     "wardrobeMatches": [],
     "mallActionLabel": "一键配衣",
-    "provider": "gemini_banana"
+    "provider": "doubao"
   }
 }
 ```

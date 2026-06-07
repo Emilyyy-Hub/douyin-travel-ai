@@ -2,7 +2,7 @@
 
 Express backend for the MVP stage of the Douyin travel inspiration to action plan tool.
 
-The current implementation uses in-memory storage, mock video analysis, and mock outfit generation. It does not download Douyin videos, call AI APIs, connect to a database, or execute shell commands with user URLs.
+The current implementation uses in-memory storage, mock video analysis, mock legacy outfit generation, and Gemini image generation. It does not download Douyin videos, connect to a database, or execute shell commands with user URLs.
 
 ## Setup
 
@@ -20,6 +20,9 @@ Default service URL: `http://localhost:8000`
 PORT=8000
 FRONTEND_ORIGIN=http://localhost:3000
 AI_PROVIDER=mock
+IMAGE_PROVIDER=gemini_banana
+GEMINI_API_KEY=fake_key_replace_me
+GEMINI_IMAGE_MODEL=gemini-2.5-flash-image
 ```
 
 `FRONTEND_ORIGIN` is the only browser origin allowed by CORS. Requests without an origin, such as server-side tests, are allowed.
@@ -77,4 +80,4 @@ Returns task progress while processing, then a completed travel plan.
 
 ## Future AI Integration
 
-Replace `src/services/mock-video-analyzer.ts` and `src/services/mock-plan-generator.ts` with real provider implementations that satisfy `VideoAnalyzer` and `PlanGenerator`. Routes should not need to change.
+Replace `src/services/mock-video-analyzer.ts` and `src/services/mock-plan-generator.ts` with real provider implementations that satisfy `VideoAnalyzer` and `PlanGenerator`. Image generation is already routed through `src/services/gemini-banana-image-generator.ts`.

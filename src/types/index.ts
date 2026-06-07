@@ -3,7 +3,7 @@ export type SourceType = "demo" | "douyin_url" | "manual_keywords";
 export type InferenceType = "extracted" | "inferred";
 export type PlanStatus = "processing" | "completed";
 export type ImagePlanStatus = "processing" | "completed" | "failed";
-export type ImageProvider = "doubao";
+export type ImageProvider = "gemini_banana";
 
 export interface DemoCase {
   id: DemoCaseId;

@@ -2,7 +2,7 @@
   "name": "backend",
   "version": "1.0.0",
   "description": "Express API for Douyin travel inspiration planning MVP",
-  "main": "dist/server.js",
+  "main": "dist/src/server.js",
   "directories": {
     "test": "tests"
   },
